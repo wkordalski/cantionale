@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import sys
+
 from parser import parse_file
 from content_error import ContentError
 
@@ -52,6 +54,50 @@ class Style:
     self.section_numbering_height = 32.
     self.section_numbering_edge_distance = 32.
     self.section_numbering_both = True
+    
+    self.song_margin_inner = 32.
+    self.song_margin_outer = 80.
+    self.song_margin_top = 64.
+    self.song_margin_bottom = 64.
+    
+    self.song_title_font_name = 'DejaVuSans-Bold'
+    self.song_title_font_size = 14.
+    self.song_title_line_height = 16.
+    self.song_title_margin_post = 4.
+    
+    self.song_subtitle = True
+    self.song_subtitle_font_name = 'DejaVuSans-Bold'
+    self.song_subtitle_font_size = 14.
+    self.song_subtitle_line_height = 16.
+    self.song_subtitle_margin_post = 4.
+    
+    self.song_author = True
+    self.song_author_font_name = 'DejaVuSans-Bold'
+    self.song_author_font_size = 14.
+    self.song_author_line_height = 16.
+    self.song_author_margin_post = 4.
+    
+    self.song_tags = True
+    self.song_tags_font_name = 'DejaVuSans-Bold'
+    self.song_tags_font_size = 14.
+    self.song_tags_line_height = 16.
+    self.song_tags_margin_post = 4.
+    
+    self.song_url_font_name = 'DejaVuSans-Bold'
+    self.song_url_font_size = 14.
+    self.song_url_line_height = 16.
+    self.song_url_margin_post = 4.
+    
+    self.song_numbering_edge_distance = 20.
+    self.song_numbering_font_name = 'DejaVuSans'
+    self.song_numbering_font_size = 14.
+    self.song_numbering_line_height = 16.
+    
+    self.song_qr_size = 48.
+    self.song_numbering_qr_spacing = 8.
+    self.song_url_qr_edge_distance = 16.
+    
+    self.song_url = ['qr']
     
     if f != None:
       self.read_from_file(f)
@@ -130,4 +176,4 @@ class Style:
     # TODO
     
     if len(config) > 0:
-      print("Unused labels in "+f.name+": " + str(config.keys(), file=sys.strerr))
+      print("Unused labels in "+f.name+": " + str(config.keys()), file=sys.stderr)

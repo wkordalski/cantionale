@@ -8,14 +8,15 @@ import os
 from parser import parse_file
 from style import Style
 from content_error import ContentError
+from song import Song
 
 from reportlab.pdfgen import canvas
-from reportlab.graphics.barcode.qr import QrCodeWidget
 from reportlab.lib import pagesizes
 from reportlab.lib.units import inch
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.utils import simpleSplit
+
 
 '''
 If your text is one line string then you can use
@@ -32,33 +33,7 @@ lines is a list of all the lines of your paragraph, if you know the line spacing
 height of the paragraph can be calculated as lineSpacing*len(lines)
 '''
 
-class Song:
-  def __init__(self, f):
-    self.title = ''
-    self.subtitle = ''
-    self.author = ''
-    self.url = ''
-    self.tags = []
-    self.note = []
-    self.lyrics = ''
 
-    config = parse_file(f)
-
-    if 'title' in config: self.title = config.pop('title')
-    else: raise ContentError("Song attribute 'title' not specified.", f.name)
-
-    if 'subtitle' in config: self.subtitle = config.pop('subtitle')
-    if 'author' in config: self.author = config.pop('author')
-    if 'url' in config: self.url = config.pop('url')
-    if 'tags' in config: self.tags = config.pop('tags').split()
-    if 'note' in config: self.note = config.pop('note')
-    if 'lyrics' in config: self.lyrics = config.pop('lyrics')
-
-    if len(config) > 0:
-      print("Unused labels in "+f.name+": " + str(config.keys()), file=sys.stderr)
-      
-  def draw(self, canvas, songbook, section, position, identifier, first, last):
-    return (position, first, identifier)
 
 class Section:
   def __init__(self, f):
@@ -91,6 +66,12 @@ class Section:
     if len(config) > 0:
       print("Unused labels in "+f.name+": " + str(config.keys()), file=sys.strerr)
       
+  def index(self, number):
+    if self.prefix == '':
+      return str(number)
+    else:
+      return self.prefix + ' ' + str(number)
+    
   def draw(self, canvas, songbook):
     c = canvas
     sb = songbook
@@ -123,16 +104,16 @@ class Section:
     
     pos -= sb.style.section_description_song_spacing
     idx = 0
-    fst = self.prefix + ' 1'
+    fst = self.index(1)
     lst = ''
     for song in self.songs:
       idx += 1
-      (pos, fst, lst) = song.draw(c, sb, self, pos, self.prefix + ' ' + str(idx), fst, lst)
+      (pos, fst, lst) = song.draw(c, sb, self, pos, self.index(idx), fst, lst)
       pos -= sb.style.section_song_song_spacing
-    if len(self.songs) > 0: self.close_page(c, sb, self, fst, lst)
+    if len(self.songs) > 0: self.close_page(c, sb, fst, lst)
     pass
   
-  def close_page(self, canvas, songbook, section, left, right):
+  def close_page(self, canvas, songbook, left, right):
     # use canvas.getPageNumber() to know if we need to print left or right
     num_heig = songbook.height - songbook.style.section_numbering_height
     num_edgd = songbook.style.section_numbering_edge_distance
@@ -210,10 +191,14 @@ class Songbook:
     if len(config) > 0:
       print("Unused labels in "+f.name+": " + str(config.keys()), file=sys.stderr)
 
+  def is_left_page(self, canvas):
+    return (canvas.getPageNumber() %2 == 0)
 
   def draw(self, filename):
     pagesize = pagesizes.A4
     if self.style.pagesize == 'A4': pagesize = pagesizes.A4
+    elif self.style.pagesize == 'A5': pagesize = pagesizes.A5
+    elif self.style.pagesize == 'B5': pagesize = pagesizes.B5
     else: raise NotImplementedError()
     c = canvas.Canvas(filename, pagesize=pagesize)
     (self.width, self.height) = pagesize
