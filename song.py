@@ -8,6 +8,18 @@ from reportlab.graphics.barcode.qr import QrCodeWidget
 from reportlab.graphics import renderPDF
 from reportlab.graphics.shapes import Drawing
 
+class DefiningPart:
+  # TODO
+  pass
+
+class CallingPart:
+  # TODO
+  pass
+
+class InstrumentalPart:
+  # TODO
+  pass
+
 class Song:
   def __init__(self, f):
     self.title = ''
@@ -17,6 +29,7 @@ class Song:
     self.tags = []
     self.note = []
     self.lyrics = ''
+    self.parts = []
 
     config = parse_file(f)
 
@@ -44,10 +57,10 @@ class Song:
     fpos = position
     
     titleA = betterSplit(self.title.strip(), st.song_title_font_name, st.song_title_font_size, wrk_widt)
-    subtitleA = betterSplit(self.subtitle.strip(), st.song_subtitle_font_name, st.song_subtitle_font_size, wrk_widt)
-    authorA = betterSplit(self.author.strip(), st.song_author_font_name, st.song_author_font_size, wrk_widt)
-    tagsA = betterSplit(' '.join(self.tags).strip(), st.song_tags_font_name, st.song_tags_font_size, wrk_widt)
-    urlA = betterSplit(self.url.strip(), st.song_url_font_name, st.song_url_font_size, wrk_widt)
+    subtitleA = betterSplit(self.subtitle.strip(), st.song_subtitle_font_name, st.song_subtitle_font_size, wrk_widt - st.song_subtitle_indent)
+    authorA = betterSplit(self.author.strip(), st.song_author_font_name, st.song_author_font_size, wrk_widt - st.song_author_indent)
+    tagsA = betterSplit(' '.join(self.tags).strip(), st.song_tags_font_name, st.song_tags_font_size, wrk_widt - st.song_tags_indent)
+    urlA = betterSplit(self.url.strip(), st.song_url_font_name, st.song_url_font_size, wrk_widt - st.song_url_indent)
     
     min_hej = len(titleA)*st.song_title_line_height + st.song_title_margin_post
     min_hej += 0 if not st.song_subtitle else len(subtitleA)*st.song_subtitle_line_height + st.song_subtitle_margin_post
@@ -59,6 +72,7 @@ class Song:
     if position - st.song_margin_bottom < min_hej:
       section.close_page(c, sb, first, last)
       fpos = mpos = position = sb.height - st.song_margin_top
+      first = identifier
       
     if sb.is_left_page(c):
       margin_left = st.song_margin_outer
@@ -80,7 +94,7 @@ class Song:
       c.setFont(fnt_name, fnt_size)
       for line in subtitleA:
         position -= st.song_subtitle_line_height
-        c.drawString(margin_left, position, line)
+        c.drawString(margin_left+st.song_subtitle_indent, position, line)
     # author
     if st.song_author:
       fnt_name = st.song_author_font_name
@@ -88,7 +102,7 @@ class Song:
       c.setFont(fnt_name, fnt_size)
       for line in authorA:
         position -= st.song_author_line_height
-        c.drawString(margin_left, position, line)
+        c.drawString(margin_left+st.song_author_indent, position, line)
     # tags
     if st.song_tags:
       fnt_name = st.song_tags_font_name
@@ -96,7 +110,7 @@ class Song:
       c.setFont(fnt_name, fnt_size)
       for line in tagsA:
         position -= st.song_tags_line_height
-        c.drawString(margin_left, position, line)
+        c.drawString(margin_left+st.song_tags_indent, position, line)
     # url
     if 'text' in st.song_url:
       fnt_name = st.song_url_font_name
@@ -104,7 +118,7 @@ class Song:
       c.setFont(fnt_name, fnt_size)
       for line in urlA:
         position -= st.song_url_line_height
-        c.drawString(margin_left, position, line)
+        c.drawString(margin_left+st.song_url_indent, position, line)
     # numbering
     fnt_name = st.song_numbering_font_name
     fnt_size = st.song_numbering_font_size
@@ -119,8 +133,9 @@ class Song:
       qr = QrCodeWidget(self.url)
       d = Drawing(st.song_qr_size, st.song_qr_size, transform=[st.song_qr_size/qr.barWidth,0,0,st.song_qr_size/qr.barHeight,0,0])
       d.add(qr)
+      mpos -= st.song_qr_size + st.song_numbering_qr_spacing
       if sb.is_left_page(c):
-        renderPDF.draw(d, c, st.song_url_qr_edge_distance, mpos - st.song_numbering_qr_spacing - st.song_qr_size)
+        renderPDF.draw(d, c, st.song_url_qr_edge_distance, mpos)
       else:
-        renderPDF.draw(d, c, sb.width - st.song_url_qr_edge_distance - st.song_qr_size, mpos - st.song_numbering_qr_spacing - st.song_qr_size)
-    return (position, first, identifier) 
+        renderPDF.draw(d, c, sb.width - st.song_url_qr_edge_distance - st.song_qr_size, mpos)
+    return (min(position, mpos), first, identifier) 

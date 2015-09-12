@@ -66,29 +66,33 @@ class Style:
     self.song_title_margin_post = 4.
     
     self.song_subtitle = True
-    self.song_subtitle_font_name = 'DejaVuSans-Bold'
-    self.song_subtitle_font_size = 14.
-    self.song_subtitle_line_height = 16.
+    self.song_subtitle_font_name = 'DejaVuSans'
+    self.song_subtitle_font_size = 12.
+    self.song_subtitle_line_height = 14.
     self.song_subtitle_margin_post = 4.
+    self.song_subtitle_indent = 8.
     
-    self.song_author = True
-    self.song_author_font_name = 'DejaVuSans-Bold'
-    self.song_author_font_size = 14.
-    self.song_author_line_height = 16.
+    self.song_author = False
+    self.song_author_font_name = 'DejaVuSans'
+    self.song_author_font_size = 12.
+    self.song_author_line_height = 14.
     self.song_author_margin_post = 4.
+    self.song_author_indent = 8.
     
-    self.song_tags = True
-    self.song_tags_font_name = 'DejaVuSans-Bold'
-    self.song_tags_font_size = 14.
-    self.song_tags_line_height = 16.
+    self.song_tags = False
+    self.song_tags_font_name = 'DejaVuSans'
+    self.song_tags_font_size = 10.
+    self.song_tags_line_height = 12.
     self.song_tags_margin_post = 4.
+    self.song_tags_indent = 16.
     
-    self.song_url_font_name = 'DejaVuSans-Bold'
-    self.song_url_font_size = 14.
-    self.song_url_line_height = 16.
+    self.song_url_font_name = 'DejaVuSans'
+    self.song_url_font_size = 10.
+    self.song_url_line_height = 12.
     self.song_url_margin_post = 4.
+    self.song_url_indent = 8.
     
-    self.song_numbering_edge_distance = 20.
+    self.song_numbering_edge_distance = 24.
     self.song_numbering_font_name = 'DejaVuSans'
     self.song_numbering_font_size = 14.
     self.song_numbering_line_height = 16.

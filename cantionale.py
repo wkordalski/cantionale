@@ -49,7 +49,6 @@ class Section:
     else: raise ContentError("Section attribute 'title' not specified.", f.name)
 
     if 'prefix' in config: self.prefix = config.pop('prefix')
-    else: raise ContentError("Section attribute 'prefix' not specified.", f.name)
 
     if 'directory' in config: directory = config.pop('directory')
     if 'description' in config: self.description = config.pop('description')
@@ -64,7 +63,7 @@ class Section:
         self.songs.append(s)
 
     if len(config) > 0:
-      print("Unused labels in "+f.name+": " + str(config.keys()), file=sys.strerr)
+      print("Unused labels in "+f.name+": " + str(config.keys()), file=sys.stderr)
       
   def index(self, number):
     if self.prefix == '':
