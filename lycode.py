@@ -1,6 +1,52 @@
 # -*- coding: utf-8 -*-
 
 import re
+from content_error import ContentError
+
+def strip(line):
+  return line # TODO
+
+# according to our assumptions: tag handle only whole lines
+def _consumeLines(body, lines, repetitions, finalizer):
+  idx = 0
+  begin = len(lines)
+  while True:
+    while len(body)>idx and is_whitespace(body[idx]): idx+=1
+    if len(body) <= idx:
+      finalizer(lines, repetitions, begin)
+      return
+    # two possibilities:
+    # 1) rep tag
+    if type(body[idx]) == Tag:
+      body[idx].consumeLines(lines, repetitions)
+      idx += 1
+      while len(body)>idx and type(body[idx]) == Letter and body[idx].value.isspace(): idx+= 1
+      # newline or end => OK; else => error
+      if len(body)<=idx:
+        finalizer(lines, repetitions, begin)
+        return # OK
+      if type(body[idx]) == Linebreak:
+        idx += 1
+        continue
+      raise ContentError("Newline only allowed after [/rep]",'')
+    # 2) simple line
+    else:
+      acc = []
+      # consume till Linebreak or end, fail on Tag
+      while len(body)>idx and type(body[idx]) not in {Linebreak, Tag}:
+        acc.append(body[idx])
+        idx += 1
+      if len(body)<=idx or type(body[idx]) == Linebreak:
+        acc = strip(acc)
+        if acc != []: lines.append(acc)
+      if len(body)<=idx:
+        finalizer(lines, repetitions, begin)
+        return # OK
+      if type(body[idx]) == Linebreak:
+        idx += 1
+        continue
+      raise ContentError("Tags inside the line not allowed",'')
+
 
 class ParsingError(Exception):
   def __init__(self, message):
@@ -13,11 +59,15 @@ class Section:
   def __init__(self, head='', options='', body=None):
     self.head = head
     self.options = options
-    if body: self.body = body
-    else: self.body = []
+    self.body = (body if body else [])
 
   def __repr__(self):
     return '<section: '+self.head+'>['+''.join([repr(t) for t in self.body])+']'
+
+  # according to our assumptions: tag handle only whole lines
+  def consumeLines(self, lines, repetitions):
+    def finalizer(l, r, b): pass
+    _consumeLines(self.body, lines, repetitions, finalizer)
 
 class Letter:
   def __init__(self, value):
@@ -28,12 +78,17 @@ class Tag:
   def __init__(self, head='', options='', body=None):
     self.head = head
     self.options = options
-    if body: self.body = body
-    else: self.body = []
+    self.body = (body if body else [])
 
 
   def __repr__(self):
     return '<tag: '+self.head+'>['+''.join([repr(t) for t in self.body])+']'
+
+  # according to our assumptions: tag handle only whole lines
+  def consumeLines(self, lines, repetitions):
+    def finalizer(l, r, b):
+      r.append((b, len(l)))
+    _consumeLines(self.body, lines, repetitions, finalizer)
 
 class Chord:
   def __init__(self, value):
@@ -98,6 +153,10 @@ def parse(s):
   for elt in sections[0].body:
     if not is_code_whitespace(elt): raise ParsingError('Some content out of section')
   return sections[1:]
+
+
+def is_whitespace(s):
+  return is_code_whitespace(s) or type(s) == LinebreakSuggestion
 
 def is_code_whitespace(s):
   return type(s) == Linebreak or type(s) == Letter and s.value.isspace()

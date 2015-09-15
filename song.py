@@ -10,9 +10,15 @@ from reportlab.graphics.barcode.qr import QrCodeWidget
 from reportlab.graphics import renderPDF
 from reportlab.graphics.shapes import Drawing
 
+
 class DefiningPart:
-  def __init__(self, section):
-    pass
+  def __init__(self, part, song):
+    self.name = part.options.strip()
+    song.part_by_name[self.name] = self
+    self.body = part.body
+    self.lines = []         # array of arrays of elements
+    self.repetitions = []   # array of pairs of indices
+    part.consumeLines(self.lines, self.repetitions)
 
   def height(self, songbook, section, width):
     return 0
@@ -21,8 +27,11 @@ class DefiningPart:
     return False
 
 class ReferencingPart:
-  def __init__(self, section):
-    pass
+  def __init__(self, part, song):
+    self.rname = part.options.strip()
+    self.referee = song.part_by_name.get(self.rname, None)
+    if not referee: raise ContentError("Referencing unknown part (%s)."%self.rname)
+    self.body = part.body
 
   def height(self, songbook, section, width):
     return 0
@@ -31,8 +40,8 @@ class ReferencingPart:
     return False
 
 class InstrumentalPart:
-  def __init__(self, section):
-    pass
+  def __init__(self, part, song):
+    self.body = part.body
 
   def height(self, songbook, section, width):
     return 0
@@ -50,6 +59,7 @@ class Song:
     self.note = []
     self.lyrics = ''
     self.parts = []
+    self.part_by_name = {}
 
     config = parse_file(f)
 
@@ -69,11 +79,11 @@ class Song:
     sects = lycode.parse(self.lyrics)
     for sect in sects:
       if sect.head == 'def':
-        self.parts.append(DefiningPart(sect))
+        self.parts.append(DefiningPart(sect, self))
       elif sect.head == 'ref':
-        self.part.append(ReferencingPart(sect))
+        self.part.append(ReferencingPart(sect, self))
       elif sect.head == 'instrumental':
-        self.part.append(InstrumentalPart(sect))
+        self.part.append(InstrumentalPart(sect, self))
       else:
         raise ContentError("Unknown section type", f.name)
 
@@ -102,7 +112,7 @@ class Song:
     min_hej += 0 if not st.song_author else len(authorA)*st.song_author_line_height + st.song_author_margin_post
     min_hej += 0 if not st.song_tags else len(tagsA)*st.song_tags_line_height + st.song_tags_margin_post
     min_hej += 0 if 'text' not in st.song_url else len(urlA)*st.song_url_line_height + st.song_url_margin_post
-    min_hej += self.getFirstPartHeight(sb, section)
+    min_hej += self.getFirstPartHeight(sb, section, wrk_widt)   # TODO: czy taka szerokość robocza?
     min_hej = max(min_hej, st.song_numbering_line_height + st.song_numbering_qr_spacing + st.song_qr_size)
     if position - st.song_margin_bottom < min_hej:
       section.close_page(c, sb, first, last)

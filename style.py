@@ -103,6 +103,8 @@ class Style:
 
     self.song_url = ['qr']
 
+    self.song_skip_instrumentals = False
+
     if f != None:
       self.read_from_file(f)
 
