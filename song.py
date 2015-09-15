@@ -4,21 +4,41 @@ from parser import parse_file
 from content_error import ContentError
 from lib import betterSplit
 
+import lycode
+
 from reportlab.graphics.barcode.qr import QrCodeWidget
 from reportlab.graphics import renderPDF
 from reportlab.graphics.shapes import Drawing
 
 class DefiningPart:
-  # TODO
-  pass
+  def __init__(self, section):
+    pass
 
-class CallingPart:
-  # TODO
-  pass
+  def height(self, songbook, section, width):
+    return 0
+
+  def is_instrumental(self):
+    return False
+
+class ReferencingPart:
+  def __init__(self, section):
+    pass
+
+  def height(self, songbook, section, width):
+    return 0
+
+  def is_instrumental(self):
+    return False
 
 class InstrumentalPart:
-  # TODO
-  pass
+  def __init__(self, section):
+    pass
+
+  def height(self, songbook, section, width):
+    return 0
+
+  def is_instrumental(self):
+    return True
 
 class Song:
   def __init__(self, f):
@@ -45,23 +65,38 @@ class Song:
 
     if len(config) > 0:
       print("Unused labels in "+f.name+": " + str(config.keys()), file=sys.stderr)
-  
-  def getFirstPartHeight(self, songbook, section):
-    return 0. # TODO
-  
+
+    sects = lycode.parse(self.lyrics)
+    for sect in sects:
+      if sect.head == 'def':
+        self.parts.append(DefiningPart(sect))
+      elif sect.head == 'ref':
+        self.part.append(ReferencingPart(sect))
+      elif sect.head == 'instrumental':
+        self.part.append(InstrumentalPart(sect))
+      else:
+        raise ContentError("Unknown section type", f.name)
+
+  def getFirstPartHeight(self, songbook, section, width):
+    parts = self.parts
+    if songbook.style.song_skip_instrumentals:
+      parts = filter(lambda x: not x.is_instrumental(), parts)
+    if parts == []: return 0.
+    else: return parts[0].height(songbook, section, width)
+
   def draw(self, canvas, songbook, section, position, identifier, first, last):
     st = songbook.style
     sb = songbook
     c = canvas
     wrk_widt = sb.width - st.song_margin_inner - st.song_margin_outer
     fpos = position
-    
+
     titleA = betterSplit(self.title.strip(), st.song_title_font_name, st.song_title_font_size, wrk_widt)
     subtitleA = betterSplit(self.subtitle.strip(), st.song_subtitle_font_name, st.song_subtitle_font_size, wrk_widt - st.song_subtitle_indent)
     authorA = betterSplit(self.author.strip(), st.song_author_font_name, st.song_author_font_size, wrk_widt - st.song_author_indent)
     tagsA = betterSplit(' '.join(self.tags).strip(), st.song_tags_font_name, st.song_tags_font_size, wrk_widt - st.song_tags_indent)
     urlA = betterSplit(self.url.strip(), st.song_url_font_name, st.song_url_font_size, wrk_widt - st.song_url_indent)
-    
+
     min_hej = len(titleA)*st.song_title_line_height + st.song_title_margin_post
     min_hej += 0 if not st.song_subtitle else len(subtitleA)*st.song_subtitle_line_height + st.song_subtitle_margin_post
     min_hej += 0 if not st.song_author else len(authorA)*st.song_author_line_height + st.song_author_margin_post
@@ -73,7 +108,7 @@ class Song:
       section.close_page(c, sb, first, last)
       fpos = mpos = position = sb.height - st.song_margin_top
       first = identifier
-      
+
     if sb.is_left_page(c):
       margin_left = st.song_margin_outer
       margin_right = st.song_margin_inner
@@ -138,4 +173,4 @@ class Song:
         renderPDF.draw(d, c, st.song_url_qr_edge_distance, mpos)
       else:
         renderPDF.draw(d, c, sb.width - st.song_url_qr_edge_distance - st.song_qr_size, mpos)
-    return (min(position, mpos), first, identifier) 
+    return (min(position, mpos), first, identifier)
