@@ -4,16 +4,29 @@ import re
 from content_error import ContentError
 
 def strip(line):
-  return line # TODO
+  def lstrip(line):
+    i = 0
+    for e in line:
+      if type(e) == Letter and e.value.isspace():
+        i += 1
+      else: break
+    return line[i:]
+  def rstrip(line):
+    i = 0
+    for e in reversed(line):
+      if type(e) == Letter and e.value.isspace():
+        i -= 1
+      else: break
+    return line[:-i] if i > 0 else line
+  return rstrip(lstrip(line))
 
 # according to our assumptions: tag handle only whole lines
 def _consumeLines(body, lines, repetitions, finalizer):
   idx = 0
-  begin = len(lines)
   while True:
     while len(body)>idx and is_whitespace(body[idx]): idx+=1
     if len(body) <= idx:
-      finalizer(lines, repetitions, begin)
+      finalizer(lines, repetitions)
       return
     # two possibilities:
     # 1) rep tag
@@ -23,7 +36,7 @@ def _consumeLines(body, lines, repetitions, finalizer):
       while len(body)>idx and type(body[idx]) == Letter and body[idx].value.isspace(): idx+= 1
       # newline or end => OK; else => error
       if len(body)<=idx:
-        finalizer(lines, repetitions, begin)
+        finalizer(lines, repetitions)
         return # OK
       if type(body[idx]) == Linebreak:
         idx += 1
@@ -40,7 +53,7 @@ def _consumeLines(body, lines, repetitions, finalizer):
         acc = strip(acc)
         if acc != []: lines.append(acc)
       if len(body)<=idx:
-        finalizer(lines, repetitions, begin)
+        finalizer(lines, repetitions)
         return # OK
       if type(body[idx]) == Linebreak:
         idx += 1
@@ -66,7 +79,7 @@ class Section:
 
   # according to our assumptions: tag handle only whole lines
   def consumeLines(self, lines, repetitions):
-    def finalizer(l, r, b): pass
+    def finalizer(l, r): pass
     _consumeLines(self.body, lines, repetitions, finalizer)
 
 class Letter:
@@ -86,8 +99,8 @@ class Tag:
 
   # according to our assumptions: tag handle only whole lines
   def consumeLines(self, lines, repetitions):
-    def finalizer(l, r, b):
-      r.append((b, len(l)))
+    begin = len(lines)
+    def finalizer(l, r): r.append((begin, len(l), int(self.options)))
     _consumeLines(self.body, lines, repetitions, finalizer)
 
 class Chord:
@@ -125,7 +138,7 @@ def parse(s):
     ret1 = re.match('^\[#\s*(?P<head>\w+)(\s+(?P<options>[^\]]*))?\]', s)
     ret2 = re.match('^\[\s*(?P<head>\w+)(\s+(?P<options>[^\]]*))?\]', s)
     ret3 = re.match('^\[/\s*(?P<head>\w+)\s*\]', s)
-    ret4 = re.match('^\{(?P<name>.+)\}', s)
+    ret4 = re.match('^\{(?P<name>[^\}]+)\}', s)
     if ret1:
       if container != []: raise ParsingError('Not closed tag')
       section = Section(ret1.group('head').strip(), get_group(ret1, 'options', '').strip())

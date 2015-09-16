@@ -64,13 +64,13 @@ class Section:
 
     if len(config) > 0:
       print("Unused labels in "+f.name+": " + str(config.keys()), file=sys.stderr)
-      
+
   def index(self, number):
     if self.prefix == '':
       return str(number)
     else:
       return self.prefix + ' ' + str(number)
-    
+
   def draw(self, canvas, songbook):
     c = canvas
     sb = songbook
@@ -85,7 +85,7 @@ class Section:
     for line in lines:
       pos -= lin_heig
       c.drawCentredString(sb.width/2.0, pos, line)
-      
+
     if sb.style.section_description and self.description != '':
       pos -= sb.style.section_title_description_spacing
       fnt_name = sb.style.section_description_font_name
@@ -100,7 +100,7 @@ class Section:
           c.setFont(fnt_name, fnt_size)
           pos = sb.height - sb.style.section_margin_top - lin_heig
         c.drawString(sb.style.section_margin_left, pos, line)
-    
+
     pos -= sb.style.section_description_song_spacing
     idx = 0
     fst = self.index(1)
@@ -110,13 +110,17 @@ class Section:
       (pos, fst, lst) = song.draw(c, sb, self, pos, self.index(idx), fst, lst)
       pos -= sb.style.section_song_song_spacing
     if len(self.songs) > 0: self.close_page(c, sb, fst, lst)
+    if songbook.is_left_page(c):
+      canvas.showPage()
     pass
-  
+
   def close_page(self, canvas, songbook, left, right):
     # use canvas.getPageNumber() to know if we need to print left or right
-    num_heig = songbook.height - songbook.style.section_numbering_height
+    st = songbook.style
+    num_heig = songbook.height - songbook.style.section_numbering_height - songbook.style.section_header_numbering_line_height
     num_edgd = songbook.style.section_numbering_edge_distance
     pag_widt = songbook.width
+    canvas.setFont(st.section_header_numbering_font_name, st.section_header_numbering_font_size)
     if songbook.style.section_numbering_both:
       # right and left printed
       canvas.drawString(num_edgd, num_heig, left)
@@ -203,13 +207,13 @@ class Songbook:
     (self.width, self.height) = pagesize
     pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf'))
     pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', 'DejaVuSans-Bold.ttf'))
-    
+
     self.draw_title_page(c)
     self.draw_note_page(c)
     for chapter in self.contents:
       chapter.draw(c, self)
     c.save()
-    
+
   def draw_title_page(self, c):
     if self.style.titlepage:
       # title
@@ -221,10 +225,10 @@ class Songbook:
       for line in lines:
         pos -= lin_heig
         c.drawCentredString(self.width/2.0, pos, line)
-      
-        
+
+
       pos -= self.style.titlepage_title_subtitle_spacing
-      
+
       lines = self.subtitle.strip().split(sep='\n')
       fnt_size = self.style.titlepage_subtitle_font_size
       lin_heig = self.style.titlepage_subtitle_line_height
@@ -232,7 +236,7 @@ class Songbook:
       for line in lines:
         pos -= lin_heig
         c.drawCentredString(self.width/2.0, pos, line)
-      
+
       lines = self.author.strip().split(sep='\n')
       fnt_size = self.style.titlepage_author_font_size
       lin_heig = self.style.titlepage_author_line_height
@@ -241,10 +245,10 @@ class Songbook:
       for line in lines:
         bpos -= lin_heig
         c.drawCentredString(self.width/2.0, bpos, line)
-        
+
       c.showPage()
       c.showPage()
-        
+
   def draw_note_page(self, c):
     if self.style.notepage and self.note.strip() != '':
       fnt_size = self.style.notepage_font_size

@@ -56,7 +56,7 @@ class Style:
     self.section_numbering_both = True
 
     self.song_margin_inner = 32.
-    self.song_margin_outer = 80.
+    self.song_margin_outer = 64.
     self.song_margin_top = 64.
     self.song_margin_bottom = 64.
 
@@ -104,6 +104,38 @@ class Style:
     self.song_url = ['qr']
 
     self.song_skip_instrumentals = False
+    self.song_repeat_character = '✕'
+    self.song_repeat_font_name = 'DejaVuSans'
+    self.song_repeat_font_size = 10.
+    self.song_repeat_margin_left = 4.
+    self.song_repeat_line_text_spacing = 2.
+
+
+    self.song_chords = True
+
+    self.song_lyrics_repetition_spacing = 2.
+    self.song_repetition_chords_spacing = 2.
+    self.song_repetition_column_optimal_width = 64.
+    self.song_chords_column_width = 70.
+
+    self.song_text_line_indent = 20.
+    self.song_text_line_indent_first = 12.
+    self.song_text_font_name = 'DejaVuSans'
+    self.song_text_font_size = 11.
+    self.song_text_line_height = 12.
+    self.song_chords_font_name = 'DejaVuSans-Bold'
+    self.song_chords_font_size = 11.
+    self.song_chords_line_height = 12.
+    self.song_part_numbering_font_name = 'DejaVuSans'
+    self.song_part_numbering_font_size = 11.
+    self.song_part_numbering_line_height = 12.
+    self.song_part_numbering_width = 8.
+
+    self.song_part_margin_top = 8.
+
+    self.section_header_numbering_font_name = 'DejaVuSans'
+    self.section_header_numbering_font_size = 12.
+    self.section_header_numbering_line_height = 13.
 
     if f != None:
       self.read_from_file(f)
