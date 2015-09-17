@@ -107,16 +107,16 @@ class Style:
     self.song_repeat_character = '✕'
     self.song_repeat_font_name = 'DejaVuSans'
     self.song_repeat_font_size = 10.
-    self.song_repeat_margin_left = 4.
-    self.song_repeat_line_text_spacing = 2.
+    self.song_repeat_margin_left = 8.
+    self.song_repeat_line_text_spacing = 4.
 
 
     self.song_chords = True
 
     self.song_lyrics_repetition_spacing = 2.
     self.song_repetition_chords_spacing = 2.
-    self.song_repetition_column_optimal_width = 64.
-    self.song_chords_column_width = 70.
+    self.song_repetition_column_optimal_width = 96.
+    self.song_chords_column_width = 80.
 
     self.song_text_line_indent = 20.
     self.song_text_line_indent_first = 12.
@@ -136,6 +136,8 @@ class Style:
     self.section_header_numbering_font_name = 'DejaVuSans'
     self.section_header_numbering_font_size = 12.
     self.section_header_numbering_line_height = 13.
+
+    self.song_repeat_line_margin_outer = 1.
 
     if f != None:
       self.read_from_file(f)
