@@ -78,6 +78,7 @@ class Songbook:
     (self.width, self.height) = pagesize
     pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf'))
     pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', 'DejaVuSans-Bold.ttf'))
+    pdfmetrics.registerFont(TTFont('DejaVuSans-Oblique', 'DejaVuSans-Oblique.ttf'))
 
     self.draw_title_page(c)
     self.draw_note_page(c)

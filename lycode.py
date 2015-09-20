@@ -3,11 +3,13 @@
 import re
 from content_error import ContentError
 
-def strip(line):
+def strip(line, newlines = False):
   def lstrip(line):
     i = 0
     for e in line:
       if type(e) == Letter and e.value.isspace():
+        i += 1
+      elif newlines and type(e) == Linebreak:
         i += 1
       else: break
     return line[i:]
@@ -15,6 +17,8 @@ def strip(line):
     i = 0
     for e in reversed(line):
       if type(e) == Letter and e.value.isspace():
+        i -= 1
+      elif newlines and type(e) == Linebreak:
         i -= 1
       else: break
     return line[:-i] if i > 0 else line

@@ -65,7 +65,7 @@ class Style:
     self.song_title_line_height = 16.
     self.song_title_margin_post = 4.
 
-    self.song_subtitle = True
+    self.song_subtitle = False
     self.song_subtitle_font_name = 'DejaVuSans'
     self.song_subtitle_font_size = 12.
     self.song_subtitle_line_height = 14.
@@ -115,7 +115,7 @@ class Style:
 
     self.song_lyrics_repetition_spacing = 2.
     self.song_repetition_chords_spacing = 2.
-    self.song_repetition_column_optimal_width = 96.
+    self.song_repetition_column_optimal_width = 64.
     self.song_chords_column_width = 80.
 
     self.song_text_line_indent = 20.
@@ -124,7 +124,7 @@ class Style:
     self.song_text_font_size = 11.
     self.song_text_line_height = 12.
     self.song_chords_font_name = 'DejaVuSans-Bold'
-    self.song_chords_font_size = 11.
+    self.song_chords_font_size = 10.
     self.song_chords_line_height = 12.
     self.song_part_numbering_font_name = 'DejaVuSans'
     self.song_part_numbering_font_size = 11.
@@ -138,6 +138,12 @@ class Style:
     self.section_header_numbering_line_height = 13.
 
     self.song_repeat_line_margin_outer = 1.
+
+    self.song_referencing_text_font_name = 'DejaVuSans-Oblique'
+    self.song_referencing_text_font_size = 11.
+    self.song_referencing_text_line_height = 12.
+    self.song_referencing_stripped_characters = '.,:;'
+    self.song_referencing_text_line_indent = 12.
 
     if f != None:
       self.read_from_file(f)

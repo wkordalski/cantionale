@@ -4,6 +4,7 @@ from parser import parse_file
 from content_error import ContentError
 from lib import betterSplit
 from defining_part import DefiningPart
+from referencing_part import ReferencingPart
 
 import lycode
 
@@ -14,18 +15,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 
-class ReferencingPart:
-  def __init__(self, part, song):
-    self.rname = part.options.strip()
-    self.referee = song.part_by_name.get(self.rname, None)
-    if not referee: raise ContentError("Referencing unknown part (%s)."%self.rname)
-    self.body = part.body
 
-  def height(self, songbook, section, width):
-    return 0
-
-  def is_instrumental(self):
-    return False
 
 class InstrumentalPart:
   def __init__(self, part, song):
@@ -51,6 +41,8 @@ class Song:
     self.note = []
     self.parts = []
     self.part_by_name = {}
+    self.filename = f.name
+    self.known_parts = set()
 
     config = parse_file(f)
 
@@ -79,12 +71,17 @@ class Song:
       else:
         raise ContentError("Unknown section type", f.name)
 
+  def close_page(self, canvas, songbook, section, left, right):
+    section.close_page(canvas, songbook, left, right)
+    if songbook.is_left_page(canvas):
+      self.known_parts = set()
+
   def getFirstPartHeight(self, songbook, section, width):
     parts = self.parts
     if songbook.style.song_skip_instrumentals:
       parts = filter(lambda x: not x.is_instrumental(), parts)
     if parts == []: return 0.
-    else: return parts[0].height(songbook, section, width)
+    else: return parts[0].height(songbook, section, self, width)
 
   def draw(self, canvas, songbook, section, position, identifier, first, last):
     st = songbook.style

@@ -1,3 +1,5 @@
+from content_error import ContentError
+
 import lycode
 
 
@@ -33,7 +35,7 @@ class DefiningPart:
     return (ret, max(w, default=0))
 
     # splits line if needed and returns minimal lyrics width for these lines
-  def _processLine(self, line, songbook, section, lyrics_width, chords_width):
+  def _processLine(self, line, songbook, section, song, lyrics_width, chords_width, do_chords = True):
     # split data on lines
     acc = []
     cur = []
@@ -65,7 +67,7 @@ class DefiningPart:
     chfs = st.song_chords_font_size
     slin = st.song_text_line_indent
     flin = st.song_text_line_indent_first
-    pch = st.song_chords
+    pch = st.song_chords and do_chords
     lyw = list(map(lambda s: pdfmetrics.stringWidth(s, lyfn, lyfs), lyr))
     chw = list(map(lambda s: pdfmetrics.stringWidth(s, chfn, chfs), cho))
     # try to join parts of lines in O(n)
@@ -93,15 +95,15 @@ class DefiningPart:
           chl = chw[i]
           cha = cho[i]
         else:
-          raise ContentError('Please, add linebreak suggestion on line: %s'%lyr[i], '<unknown>')
+          raise ContentError('Please, add linebreak suggestion on line: %s'%lyr[i], song.filename)
     ret.append((lya, cha))
     mlw = max(mlw, lyl)
     return (ret, mlw)
 
-  def height(self, songbook, section, width):
-    return self.height_and_width(songbook, section, width)[0]
+  def height(self, songbook, section, song, width):
+    return self.height_and_width(songbook, section, song, width)[0]
 
-  def height_and_width(self, songbook, section, width):
+  def height_and_width(self, songbook, section, song, width):
     st = songbook.style
     rw = self._calculate_repetition_indentation_and_column_width(songbook, section)[1] + st.song_lyrics_repetition_spacing
     ro = st.song_repetition_column_optimal_width + st.song_lyrics_repetition_spacing  # won't be used here
@@ -111,7 +113,7 @@ class DefiningPart:
     a = 0.
     b = 0.
     for no, line in enumerate(self.lines):
-      ls, w = self._processLine(line, songbook, section, lw, cw)
+      ls, w = self._processLine(line, songbook, section, song, lw, cw)
       a += len(ls)*lh
       b = max(b, w)
     return (a, b)
@@ -131,13 +133,13 @@ class DefiningPart:
     lw = width - rw - cw
     lh = max(st.song_text_line_height, st.song_chords_line_height if st.song_chords else 0)
     lb = [-1.]*len(self.lines)
-    ph, mw = self.height_and_width(songbook, section, width)
+    ph, mw = self.height_and_width(songbook, section, song, width)
     slin = st.song_text_line_indent
     flin = st.song_text_line_indent_first
     if not sb.is_left_page(c):
-      ph = self.height(songbook, section, width)
+      ph = self.height(songbook, section, song, width)
       if ph + st.song_margin_bottom > position:
-        section.close_page(c, sb, first, last)
+        song.close_page(c, sb, section, first, last)
         position = sb.height - st.song_margin_top
         first = identifier
     if sb.is_left_page(c):
@@ -150,13 +152,14 @@ class DefiningPart:
     repos = max(chpos - st.song_repetition_chords_spacing - st.song_repetition_column_optimal_width, margin_left + mw)
     flotp = 0
     repin = self._calculate_repetition_indentation_and_column_width(songbook, section)[0]
+    song.known_parts.add(self)
     # draw part name if defined
     if self.name != '':
       c.setFont(st.song_part_numbering_font_name, st.song_part_numbering_font_size)
       c.drawRightString(margin_left + st.song_part_numbering_width, position - st.song_part_numbering_line_height, self.name)
     # draw lyrics
     for no, line in enumerate(self.lines):
-      ls = self._processLine(line, songbook, section, lw, cw)[0]
+      ls = self._processLine(line, songbook, section, song, lw, cw)[0]
       # sprawdź czy mamy tyle miejsca na stronie
       lph = len(ls)*lh
       if lph + st.song_margin_bottom > position:
@@ -172,8 +175,7 @@ class DefiningPart:
           if end == rep[1]:
             c.setFont(st.song_repeat_font_name, st.song_repeat_font_size)
             c.drawString(repos + x + st.song_repeat_margin_left+st.song_repeat_line_text_spacing, lby, st.song_repeat_character+str(rep[2]))
-        # do: section.close_page(...)
-        section.close_page(c, sb, first, last)
+        song.close_page(c, sb, section, first, last)
         position = sb.height - st.song_margin_top
         first = identifier
         flotp = no
