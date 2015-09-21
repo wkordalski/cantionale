@@ -101,6 +101,7 @@ class Song:
     min_hej += 0 if not st.song_author else len(authorA)*st.song_author_line_height + st.song_author_margin_post
     min_hej += 0 if not st.song_tags else len(tagsA)*st.song_tags_line_height + st.song_tags_margin_post
     min_hej += 0 if 'text' not in st.song_url else len(urlA)*st.song_url_line_height + st.song_url_margin_post
+    min_hej += st.song_part_margin_top
     min_hej += self.getFirstPartHeight(sb, section, wrk_widt)   # TODO: czy taka szerokość robocza?
     min_hej = max(min_hej, st.song_numbering_line_height + st.song_numbering_qr_spacing + st.song_qr_size)
     if position - st.song_margin_bottom < min_hej:
