@@ -153,10 +153,6 @@ class DefiningPart:
     flotp = 0
     repin = self._calculate_repetition_indentation_and_column_width(songbook, section)[0]
     song.known_parts.add(self)
-    # draw part name if defined
-    if self.name != '':
-      c.setFont(st.song_part_numbering_font_name, st.song_part_numbering_font_size)
-      c.drawRightString(margin_left + st.song_part_numbering_width, position - st.song_part_numbering_line_height, self.name)
     # draw lyrics
     for no, line in enumerate(self.lines):
       ls = self._processLine(line, songbook, section, song, lw, cw)[0]
@@ -187,6 +183,10 @@ class DefiningPart:
           margin_right = st.song_margin_outer
         chpos = sb.width - st.song_chords_column_width - margin_right
         repos = max(chpos - st.song_repetition_chords_spacing - st.song_repetition_column_optimal_width, margin_left + mw)
+      # draw part name if defined
+      if self.name != '' and no == 0:
+        c.setFont(st.song_part_numbering_font_name, st.song_part_numbering_font_size)
+        c.drawRightString(margin_left + st.song_part_numbering_width, position - st.song_part_numbering_line_height, self.name)
       # draw lyrics (and chords)
       fst = True
       lb[no] = position
