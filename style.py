@@ -51,12 +51,12 @@ class Style:
     self.section_description_song_spacing = 20.
     self.section_song_song_spacing = 10.
 
-    self.section_numbering_height = 32.
-    self.section_numbering_edge_distance = 32.
+    self.section_numbering_height = 24.
+    self.section_numbering_edge_distance = 24.
     self.section_numbering_both = True
 
     self.song_margin_inner = 32.
-    self.song_margin_outer = 64.
+    self.song_margin_outer = 72.
     self.song_margin_top = 64.
     self.song_margin_bottom = 64.
 
@@ -92,7 +92,7 @@ class Style:
     self.song_url_margin_post = 4.
     self.song_url_indent = 8.
 
-    self.song_numbering_edge_distance = 24.
+    self.song_numbering_edge_distance = 20.
     self.song_numbering_font_name = 'DejaVuSans'
     self.song_numbering_font_size = 14.
     self.song_numbering_line_height = 16.
@@ -144,6 +144,12 @@ class Style:
     self.song_referencing_text_line_height = 12.
     self.song_referencing_stripped_characters = '.,:;'
     self.song_referencing_text_line_indent = 12.
+
+    self.song_instrumental_font_name = 'DejaVuSans-Oblique'
+    self.song_instrumental_font_size = 11.
+    self.song_instrumental_line_height = 12.
+    self.song_instrumental_line_indent = 20.
+    self.song_instrumental_line_indent_first = 12.
 
     if f != None:
       self.read_from_file(f)

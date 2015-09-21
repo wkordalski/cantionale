@@ -5,6 +5,7 @@ from content_error import ContentError
 from lib import betterSplit
 from defining_part import DefiningPart
 from referencing_part import ReferencingPart
+from instrumental_part import InstrumentalPart
 
 import lycode
 
@@ -13,19 +14,6 @@ from reportlab.graphics import renderPDF
 from reportlab.graphics.shapes import Drawing
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-
-
-
-
-class InstrumentalPart:
-  def __init__(self, part, song):
-    self.body = part.body
-
-  def height(self, songbook, section, width):
-    return 0
-
-  def is_instrumental(self):
-    return True
 
 class Song:
   def __init__(self, f):

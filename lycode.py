@@ -128,6 +128,13 @@ class LinebreakSuggestion:
   def __repr__(self):
     return '\\'
 
+class Note:
+  def __init__(self, message):
+    self.value = '('+message+')'
+
+  def __repr__(self):
+    return self.value
+
 def parse(s):
   section = Section()
   sections = [section]
@@ -143,11 +150,15 @@ def parse(s):
     ret2 = re.match('^\[\s*(?P<head>\w+)(\s+(?P<options>[^\]]*))?\]', s)
     ret3 = re.match('^\[/\s*(?P<head>\w+)\s*\]', s)
     ret4 = re.match('^\{(?P<name>[^\}]+)\}', s)
+    ret5 = re.match('^\[\((?P<text>.+?)\)\]', s)
     if ret1:
       if container != []: raise ParsingError('Not closed tag')
       section = Section(ret1.group('head').strip(), get_group(ret1, 'options', '').strip())
       sections.append(section)
       s = s[ret1.end():]
+    elif ret5:
+      top_container().append(Note(ret5.group('text')))
+      s = s[ret5.end():]
     elif ret2:
       tag = Tag(ret2.group('head').strip(), get_group(ret2, 'options', '').strip())
       top_container().append(tag)
