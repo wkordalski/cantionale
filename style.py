@@ -151,6 +151,47 @@ class Style:
     self.song_instrumental_line_indent = 20.
     self.song_instrumental_line_indent_first = 12.
 
+    self.toc_margin_top = 64.
+    self.toc_title_font_name = 'DejaVuSans-Bold'
+    self.toc_title_font_size = 24.
+    self.toc_title_line_height = 26.
+
+    self.toc_section_section_spacing = 8.
+    self.toc_section_title_line_height = 16.
+    self.toc_section_title_font_name = 'DejaVuSans-Bold'
+    self.toc_section_title_font_size = 14.
+    self.toc_section_title_indent = 48.
+    self.toc_section_prefix_indent = 40.
+    self.toc_margin_bottom = 64.
+    self.toc_margin_inner = 24.
+    self.toc_margin_outer = 48.
+    self.toc_song_line_height = 12.
+    self.toc_song_number_font_name = 'DejaVuSans'
+    self.toc_song_number_font_size = 11.
+    self.toc_song_title_font_name = 'DejaVuSans'
+    self.toc_song_title_font_size = 11.
+    self.toc_song_number_indent = 40.
+    self.toc_song_title_indent = 48.
+    self.toc_song_song_spacing = 1.
+    self.toc_section_title_song_spacing = 4.
+
+    self.title_index_margin_top = 64.
+    self.title_index_margin_bottom = 64.
+    self.title_index_title_font_name = 'DejaVuSans-Bold'
+    self.title_index_title_font_size = 24.
+    self.title_index_song_line_height = 12.
+    self.title_index_song_song_spacing = 1.
+    self.title_index_song_title_indent = 48.
+    self.title_index_title_line_height = 26.
+    self.title_index_song_number_font_name = 'DejaVuSans'
+    self.title_index_song_number_font_size = 11.
+    self.title_index_song_title_font_size = 11.
+    self.title_index_song_title_font_name = 'DejaVuSans'
+    self.title_index_song_number_indent = 40.
+    self.title_index_title_song_spacing = 16.
+    self.title_index_margin_outer = 48.
+    self.title_index_margin_inner = 24.
+
     if f != None:
       self.read_from_file(f)
 

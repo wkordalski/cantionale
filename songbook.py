@@ -1,6 +1,8 @@
 from style import Style
 from parser import parse_file
 from section import Section
+from table_of_contents import TableOfContents
+from title_index import TitleIndex
 
 import re
 import os
@@ -54,12 +56,17 @@ class Songbook:
           self.contents.append(s)
           continue
 
-        R = re.fullmatch('table\s+of\s+contents\s+as\s(?P<name>.+)', cmd)
+        R = re.fullmatch('table\s+of\s+contents\s+with\s+(?P<map>.+)', cmd)
         if R != None:
-          s = TableOfContents(R.group('name'), self)
+          s = TableOfContents(self, eval(R.group('map')))
           self.contents.append(s)
           continue
 
+        R = re.fullmatch('title index\s+with\s+(?P<map>.+)', cmd)
+        if R != None:
+          s = TitleIndex(self, eval(R.group('map')))
+          self.contents.append(s)
+          continue
         # and so on...
 
     if len(config) > 0:
