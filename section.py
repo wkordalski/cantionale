@@ -3,12 +3,16 @@ from song import Song
 
 import os
 
+class PageBreak:
+  pass
+
 class Section:
   def __init__(self, f):
     self.title = ''
     self.prefix = ''
     self.description = ''
     self.songs = []
+    self.contents = []
 
     config = parse_file(f)
     directory = '.'
@@ -24,11 +28,15 @@ class Section:
       files = config.pop('contents').split(sep='\n')
       for fn in files:
         fname = fn.strip()
+        if fname == '-- break --':
+          self.contents.append(PageBreak())
+          continue
         if fname == '': continue
         fl = open(directory + os.sep + fname, encoding='utf-8')
         s = Song(fl)
         fl.close()
         self.songs.append(s)
+        self.contents.append(s)
 
     if len(config) > 0:
       print("Unused labels in "+f.name+": " + str(config.keys()), file=sys.stderr)
@@ -73,10 +81,16 @@ class Section:
     idx = 0
     fst = self.index(1)
     lst = ''
-    for song in self.songs:
-      idx += 1
-      (pos, fst, lst) = song.draw(c, sb, self, pos, self.index(idx), fst, lst)
-      pos -= sb.style.section_song_song_spacing
+    for elt in self.contents:
+      if type(elt) == PageBreak:
+        self.close_page(canvas, songbook, fst, lst)
+        pos = sb.height - sb.style.section_margin_top
+        fst = lst = self.index(idx+1)
+      else:
+        song = elt
+        idx += 1
+        (pos, fst, lst) = song.draw(c, sb, self, pos, self.index(idx), fst, lst)
+        pos -= sb.style.section_song_song_spacing
     if len(self.songs) > 0: self.close_page(c, sb, fst, lst)
     if songbook.is_left_page(c):
       canvas.showPage()
