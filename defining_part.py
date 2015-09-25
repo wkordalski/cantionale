@@ -165,8 +165,8 @@ class DefiningPart:
           beg = max(rep[0], flotp)
           end = min(rep[1], no)
           x = repin[no2]
-          lay = lb[beg] - st.song_repeat_line_margin_outer
-          lby = (position if end == no else lb[end]) + st.song_repeat_line_margin_outer
+          lay = lb[beg] - st.song_repetition_line_margin_outer
+          lby = (position if end == no else lb[end]) + st.song_repetition_line_margin_outer
           c.line(repos + x+st.song_repeat_margin_left, lay, repos + x+st.song_repeat_margin_left, lby)
           if end == rep[1]:
             c.setFont(st.song_repeat_font_name, st.song_repeat_font_size)
@@ -213,8 +213,8 @@ class DefiningPart:
       beg = max(rep[0], flotp)
       end = min(rep[1], no)
       x = repin[no2]
-      lay = lb[beg] - st.song_repeat_line_margin_outer
-      lby = (position if end == no else lb[end]) + st.song_repeat_line_margin_outer
+      lay = lb[beg] - st.song_repetition_line_margin_outer
+      lby = (position if end == no else lb[end]) + st.song_repetition_line_margin_outer
       c.line(repos + x+st.song_repeat_margin_left, lay, repos + x+st.song_repeat_margin_left, lby)
       if end == rep[1]:
         c.setFont(st.song_repeat_font_name, st.song_repeat_font_size)
