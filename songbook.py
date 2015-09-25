@@ -84,9 +84,8 @@ class Songbook:
     c = canvas.Canvas(filename, pagesize=pagesize)
     (self.width, self.height) = pagesize
     c.setTitle(self.title)
-    pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf'))
-    pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', 'DejaVuSans-Bold.ttf'))
-    pdfmetrics.registerFont(TTFont('DejaVuSans-Oblique', 'DejaVuSans-Oblique.ttf'))
+    for n, f in self.style.fonts.items():
+      pdfmetrics.registerFont(TTFont(n, f))
 
     self.draw_title_page(c)
     self.draw_note_page(c)
