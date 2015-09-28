@@ -26,9 +26,9 @@ class Style:
     def opt(name, default, func = None):
       if not func:
         if type(default) == str: func = str
-      elif type(default) == float: func = float
-      elif type(default) == bool: func = switch
-      else: func = str
+        elif type(default) == float: func = float
+        elif type(default) == bool: func = switch
+        else: func = str
 
       if name in config:
         return func(config.pop(name))
