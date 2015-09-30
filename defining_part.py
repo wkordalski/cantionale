@@ -113,9 +113,12 @@ class DefiningPart:
     a = 0.
     b = 0.
     for no, line in enumerate(self.lines):
-      ls, w = self._processLine(line, songbook, section, song, lw, cw)
-      a += len(ls)*lh
-      b = max(b, w)
+      if len(line) == 1 and type(line[0]) == lycode.Letter and line[0].value == '-':
+        a += st.song_separator_height
+      else:
+        ls, w = self._processLine(line, songbook, section, song, lw, cw)
+        a += len(ls)*lh
+        b = max(b, w)
     return (a, b)
 
   def is_instrumental(self):
@@ -155,57 +158,60 @@ class DefiningPart:
     song.known_parts.add(self)
     # draw lyrics
     for no, line in enumerate(self.lines):
-      ls = self._processLine(line, songbook, section, song, lw, cw)[0]
-      # sprawdź czy mamy tyle miejsca na stronie
-      lph = len(ls)*lh
-      if lph + st.song_margin_bottom > position:
-        # make page close:
-        # draw repetitions (only visible ones on this page)
-        for no2, rep in filter(lambda x: x[1][0] < no and x[1][1] > flotp, enumerate(self.repetitions)):
-          beg = max(rep[0], flotp)
-          end = min(rep[1], no)
-          x = repin[no2]
-          lay = lb[beg] - st.song_repetition_line_margin_outer
-          lby = (position if end == no else lb[end]) + st.song_repetition_line_margin_outer
-          c.line(repos + x+st.song_repeat_margin_left, lay, repos + x+st.song_repeat_margin_left, lby)
-          if end == rep[1]:
-            c.setFont(st.song_repeat_font_name, st.song_repeat_font_size)
-            c.drawString(repos + x + st.song_repeat_margin_left+st.song_repeat_line_text_spacing, lby, st.song_repeat_character+str(rep[2]))
-        song.close_page(c, sb, section, first, last)
-        position = sb.height - st.song_margin_top
-        first = identifier
-        flotp = no
-        if sb.is_left_page(c):
-          margin_left = st.song_margin_outer
-          margin_right = st.song_margin_inner
-        else:
-          margin_left = st.song_margin_inner
-          margin_right = st.song_margin_outer
-        chpos = sb.width - st.song_chords_column_width - margin_right
-        repos = max(chpos - st.song_repetition_chords_spacing - st.song_repetition_column_optimal_width, margin_left + mw)
-      # draw part name if defined
-      if self.name != '' and no == 0:
-        c.setFont(st.song_part_numbering_font_name, st.song_part_numbering_font_size)
-        c.drawRightString(margin_left + st.song_part_numbering_width, position - st.song_part_numbering_line_height, self.name)
-      # draw lyrics (and chords)
-      fst = True
-      lb[no] = position
-      for lyr, cho in ls:
-        strt = margin_left + (flin if fst else slin)
-        fst = False
-        position -= lh
-        c.setFont(st.song_text_font_name, st.song_text_font_size)
-        for elt in lyr:
-          if type(elt) == lycode.Note:
-            c.setFillColorRGB(0.4,0.4,0.4)
+      if len(line) == 1 and type(line[0]) == lycode.Letter and line[0].value == '-':
+        position -= st.song_separator_height
+      else:
+        ls = self._processLine(line, songbook, section, song, lw, cw)[0]
+        # sprawdź czy mamy tyle miejsca na stronie
+        lph = len(ls)*lh
+        if lph + st.song_margin_bottom > position:
+          # make page close:
+          # draw repetitions (only visible ones on this page)
+          for no2, rep in filter(lambda x: x[1][0] < no and x[1][1] > flotp, enumerate(self.repetitions)):
+            beg = max(rep[0], flotp)
+            end = min(rep[1], no)
+            x = repin[no2]
+            lay = lb[beg] - st.song_repetition_line_margin_outer
+            lby = (position if end == no else lb[end]) + st.song_repetition_line_margin_outer
+            c.line(repos + x+st.song_repeat_margin_left, lay, repos + x+st.song_repeat_margin_left, lby)
+            if end == rep[1]:
+              c.setFont(st.song_repeat_font_name, st.song_repeat_font_size)
+              c.drawString(repos + x + st.song_repeat_margin_left+st.song_repeat_line_text_spacing, lby, st.song_repeat_character+str(rep[2]))
+          song.close_page(c, sb, section, first, last)
+          position = sb.height - st.song_margin_top
+          first = identifier
+          flotp = no
+          if sb.is_left_page(c):
+            margin_left = st.song_margin_outer
+            margin_right = st.song_margin_inner
           else:
-            c.setFillColorRGB(0,0,0)
-          pwdt = pdfmetrics.stringWidth(elt.value, st.song_text_font_name, st.song_text_font_size)
-          c.drawString(strt, position, elt.value)
-          strt += pwdt
-        if st.song_chords:
-          c.setFont(st.song_chords_font_name, st.song_chords_font_size)
-          c.drawString(chpos, position, cho)
+            margin_left = st.song_margin_inner
+            margin_right = st.song_margin_outer
+          chpos = sb.width - st.song_chords_column_width - margin_right
+          repos = max(chpos - st.song_repetition_chords_spacing - st.song_repetition_column_optimal_width, margin_left + mw)
+        # draw part name if defined
+        if self.name != '' and no == 0:
+          c.setFont(st.song_part_numbering_font_name, st.song_part_numbering_font_size)
+          c.drawRightString(margin_left + st.song_part_numbering_width, position - st.song_part_numbering_line_height, self.name)
+        # draw lyrics (and chords)
+        fst = True
+        lb[no] = position
+        for lyr, cho in ls:
+          strt = margin_left + (flin if fst else slin)
+          fst = False
+          position -= lh
+          c.setFont(st.song_text_font_name, st.song_text_font_size)
+          for elt in lyr:
+            if type(elt) == lycode.Note:
+              c.setFillColorRGB(0.4,0.4,0.4)
+            else:
+              c.setFillColorRGB(0,0,0)
+            pwdt = pdfmetrics.stringWidth(elt.value, st.song_text_font_name, st.song_text_font_size)
+            c.drawString(strt, position, elt.value)
+            strt += pwdt
+          if st.song_chords:
+            c.setFont(st.song_chords_font_name, st.song_chords_font_size)
+            c.drawString(chpos, position, cho)
 
     no = len(self.lines)
     c.setFillColorRGB(0,0,0)

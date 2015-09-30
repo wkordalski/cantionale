@@ -215,6 +215,8 @@ class Style:
     self.title_index_margin_inner = opt('title-index.margin.inner', 24.)
     self.title_index_song_line_height = opt('title-index.song.line-height', 1.2*max(self.title_index_song_number_font_size, self.title_index_song_title_font_size))
 
+    self.song_separator_height = opt('song.separator.height', 4.)
+
     self.fonts = opt('fonts', {'DejaVuSans':'DejaVuSans.ttf', 'DejaVuSans-Bold':'DejaVuSans-Bold.ttf', 'DejaVuSans-Oblique':'DejaVuSans-Oblique.ttf'}, eval)
 
     if len(config) > 0:
