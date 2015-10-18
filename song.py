@@ -8,6 +8,7 @@ from referencing_part import ReferencingPart
 from instrumental_part import InstrumentalPart
 
 import lycode
+import sys
 
 from reportlab.graphics.barcode.qr import QrCodeWidget
 from reportlab.graphics import renderPDF
